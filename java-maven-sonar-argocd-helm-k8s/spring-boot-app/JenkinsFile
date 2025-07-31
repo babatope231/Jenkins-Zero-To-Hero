@@ -1,16 +1,14 @@
 pipeline {
   agent {
     docker {
-      image 'abhishekf5/maven-docker-java17' // ✅ Custom image with Docker CLI
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
+      image 'abhishekf5/maven-docker-java17'
+      args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
-
   environment {
     SONAR_URL = "http://20.224.163.12:9000"
     DOCKER_IMAGE = "abhishekf5/ultimate-cicd:${BUILD_NUMBER}"
   }
-
   stages {
     stage('Checkout') {
       steps {
@@ -18,14 +16,12 @@ pipeline {
         // git branch: 'main', url: 'https://github.com/babatope231/Jenkins-Zero-To-Hero.git'
       }
     }
-
     stage('Build and Test') {
       steps {
         sh 'ls -ltr'
         sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn clean package'
       }
     }
-
     stage('Static Code Analysis') {
       steps {
         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
@@ -33,7 +29,6 @@ pipeline {
         }
       }
     }
-
     stage('Build and Push Docker Image') {
       environment {
         REGISTRY_CREDENTIALS = credentials('docker-cred')
@@ -48,7 +43,6 @@ pipeline {
         }
       }
     }
-
     stage('Update Deployment File') {
       environment {
         GIT_REPO_NAME = "Jenkins-Zero-To-Hero"
