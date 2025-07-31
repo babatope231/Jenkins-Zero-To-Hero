@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    DOCKER_HUB_CREDS = credentials('docker-hub-creds') // Jenkins credentials ID
+    DOCKER_HUB_CREDS = credentials('docker-hub-creds')
   }
 
   stages {
@@ -15,9 +15,10 @@ pipeline {
     stage('Build with Maven') {
       steps {
         dir('java-maven-sonar-argocd-helm-k8s/spring-boot-app') {
-          // Run Maven build inside a Maven Docker container
-          docker.image('maven:3.9.3-eclipse-temurin-17').inside {
-            sh 'mvn clean package -DskipTests'
+          script {
+            docker.image('maven:3.9.3-eclipse-temurin-17').inside {
+              sh 'mvn clean package -DskipTests'
+            }
           }
         }
       }
@@ -39,7 +40,7 @@ pipeline {
     stage('Update Deployment File') {
       steps {
         echo 'Updating deployment files...'
-        // Your deployment update steps here
+        // Add deployment update commands here
       }
     }
   }
@@ -49,7 +50,7 @@ pipeline {
       echo 'Pipeline succeeded!'
     }
     failure {
-      echo 'Pipeline failed. Please check the logs.'
+      echo 'Pipeline failed. Please check logs.'
     }
   }
 }
